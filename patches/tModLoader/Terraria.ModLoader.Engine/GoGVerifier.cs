@@ -50,32 +50,22 @@ namespace Terraria.ModLoader.Engine
 			GetPlatformCheckInfo(out var steamAPIpath, out var vanillaGoGhash);
 			if (File.Exists(steamAPIpath)) {
 				VerifySteamAPI();
-				return false;
+				return true;
 			}
 
 			var vanillaPath = Path.GetFileName(Assembly.GetExecutingAssembly().Location) != "Terraria.exe" ? "Terraria.exe" : "Terraria_v1.3.5.3.exe";
 			if (!File.Exists(vanillaPath)) {
 				Logging.tML.Info("Vanilla Terraria.exe not found.");
-				return false;
+				return true;
 			}
 
 			if (!HashMatchesFile(vanillaGoGhash, vanillaPath))
-				return false;
+				return true;
 
 			Logging.tML.Info("GoG detected. Disabled steam check.");
-			return true;
+			return false;
 		}
 
 		private static void VerifySteamAPI() {
 			if (!Platform.IsWindows)
 				return;
-
-			var steamAPIhash = new byte[] { 123, 133, 124, 137, 123, 198, 147, 19, 228, 147, 109, 195, 220, 206, 81, 147 };
-			if (!HashMatchesFile(steamAPIhash, "steam_api.dll")) {
-				Logging.tML.Fatal("Steam API hash mismatch, assumed pirated");
-				System.Windows.Forms.MessageBox.Show("Steam API hash mismatch, assumed pirated", "Terraria: Error" + $" ({ModLoader.versionedName})");
-				Environment.Exit(1);
-			}
-		}
-	}
-}
